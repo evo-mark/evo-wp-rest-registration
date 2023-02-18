@@ -1,0 +1,31 @@
+{
+	"name": "southcoastweb/scw-wp-rest-registration",
+	"version": "1.0.0",
+	"description": "Register your Wordpress REST API endpoints easily",
+	"license": "MIT",
+	"type": "library",
+	"keywords": [
+		"wordpress",
+		"rest",
+		"api",
+		"automatic",
+		"object-oriented",
+		"wp"
+	],
+	"authors": [
+		{
+			"name": "Craig Riley",
+			"email": "c.riley@southcoastweb.co.uk",
+			"homepage": "https://craigriley.uk"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/South-Coast-Web/scw-wp-rest-registration/issues",
+		"source": "https://github.com/South-Coast-Web/scw-wp-rest-registration"
+	},
+	"autoload": {
+		"psr-4": {
+			"ScwWpRestRegistration\\": "src/"
+		}
+	}
+}

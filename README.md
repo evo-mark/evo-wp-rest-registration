@@ -1,4 +1,8 @@
-![southcoastweb logo](https://southcoastweb.co.uk/images/new-scw-logo.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://southcoastweb.co.uk/images/new-scw-logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://southcoastweb.co.uk/images/new-scw-logo.svg">
+  <img alt="southcoastweb company logo" src="https://southcoastweb.co.uk/images/new-scw-logo.svg">
+</picture>
 
 <a href="https://packagist.org/packages/southcoastweb/scw-wp-rest-registration"><img src="https://img.shields.io/packagist/v/southcoastweb/scw-wp-rest-registration?logo=packagist&logoColor=white" alt="Build status" /></a>
 <a href="https://packagist.org/packages/southcoastweb/scw-wp-rest-registration"><img src="https://img.shields.io/packagist/dt/southcoastweb/scw-wp-rest-registration" alt="Total Downloads"></a>

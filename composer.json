@@ -1,9 +1,11 @@
 {
 	"name": "southcoastweb/scw-wp-rest-registration",
-	"version": "1.0.0",
 	"description": "Register your Wordpress REST API endpoints easily",
 	"license": "MIT",
 	"type": "library",
+	"require": {
+		"php": ">=7.4"
+	},
 	"keywords": [
 		"wordpress",
 		"rest",

@@ -2,13 +2,19 @@
 
 namespace ScwWpRestRegistration;
 
+use Dotenv\Validator;
+use ScwWpRestRegistration\Validation;
+
 defined('ABSPATH') or exit;
 
 abstract class BaseRestController
 {
     protected $path;
     protected $methods;
-    protected $args;
+    protected array $args = [];
+    protected $rules = [];
+    protected array $messages = [];
+    public $validator;
 
     public function getPath()
     {
@@ -32,11 +38,19 @@ abstract class BaseRestController
 
     public function getArguments()
     {
-        return $this->args ?? [];
+        if ($this->rules) {
+            $this->validator = new Validation($this->rules, $this->args, new ValidationMessages($this->messages));
+            return $this->validator->make();
+        } else return $this->args ?? [];
     }
 
     public function authorise()
     {
         return false;
+    }
+
+    public function validated(): array
+    {
+        return $this->validator->validated ?? [];
     }
 }

@@ -17,10 +17,11 @@ class Validation
         $this->messageCentre = $messages;
     }
 
-    public function make()
+    public function createValidationCallback()
     {
-        foreach ($this->rules as $key => $rule) {
-            $args[$key]['validate_callback'] = $this->validationCallback($rule);
+        // Loop through rules and create a `validate_callback` callable
+        foreach ($this->rules as $key => $ruleSet) {
+            $args[$key]['validate_callback'] = $this->validationCallback($ruleSet);
         }
         return $args;
     }
@@ -28,32 +29,20 @@ class Validation
     /** 
      * Generates a callback that is used as the `validate_callback` property on the arg
      */
-    public function validationCallback(array $rule): callable
+    public function validationCallback(array $ruleSet): callable
     {
-        return function ($value, $request, $param) use ($rule) {
-            foreach ($rule as $ruleItem) {
+        return function ($value, $request, $param) use ($ruleSet) {
+            foreach ($ruleSet as $ruleItem) {
+                // $ruleItem = required | string | array
+                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $request);
                 if (method_exists($this, $ruleItem)) {
                     $result = $this->{$ruleItem}($value, $request, $param);
                     if ($result instanceof \WP_Error) return $result;
                 }
             }
+            // Set the value on the validated array for use in the controller
             $this->validated[$param] = $value;
         };
-    }
-
-    public function required($value, $request, $param)
-    {
-        if (empty($value)) return new \WP_Error('validation_failed', $this->formatMessage('required', $value, $request, $param));
-    }
-
-    public function string($value, $request, $param)
-    {
-        if (!is_string($value)) return new \WP_Error('validation_failed', $this->formatMessage('string', $value, $request, $param));
-    }
-
-    public function array($value, $request, $param)
-    {
-        if (!is_array($value)) return new \WP_Error('validation_failed', $this->formatMessage('array', $value, $request, $param));
     }
 
     public function formatMessage($ruleName, $value, $request, $param)

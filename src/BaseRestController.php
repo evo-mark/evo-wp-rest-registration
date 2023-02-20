@@ -38,9 +38,9 @@ abstract class BaseRestController
 
     public function getArguments()
     {
-        if ($this->rules) {
+        if (!empty($this->rules)) {
             $this->validator = new Validation($this->rules, $this->args, new ValidationMessages($this->messages));
-            return $this->validator->make();
+            return $this->validator->createValidationCallback();
         } else return $this->args ?? [];
     }
 

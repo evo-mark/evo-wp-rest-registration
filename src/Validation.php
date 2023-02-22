@@ -2,6 +2,7 @@
 
 namespace ScwWpRestRegistration;
 
+
 class Validation
 {
     protected $rules;
@@ -31,25 +32,16 @@ class Validation
      */
     public function validationCallback(array $ruleSet): callable
     {
-        return function ($value, $request, $param) use ($ruleSet) {
+        return function ($value,  $request, $param) use ($ruleSet) {
             foreach ($ruleSet as $ruleItem) {
                 // $ruleItem = required | string | array
-                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $request);
-                if (method_exists($this, $ruleItem)) {
-                    $result = $this->{$ruleItem}($value, $request, $param);
-                    if ($result instanceof \WP_Error) return $result;
+                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $this->messageCentre, $request);
+                if ($ruleResolver->error) {
+                    return $ruleResolver->error;
                 }
             }
             // Set the value on the validated array for use in the controller
             $this->validated[$param] = $value;
         };
-    }
-
-    public function formatMessage($ruleName, $value, $request, $param)
-    {
-        $message = $this->messageCentre->messages[$ruleName];
-        $message = str_replace("%param%", $param, $message);
-        $message = str_replace("%value%", $value, $message);
-        return $message;
     }
 }

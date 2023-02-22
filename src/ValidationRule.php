@@ -2,18 +2,29 @@
 
 namespace ScwWpRestRegistration;
 
+use \WP_Error;
+
 class ValidationRule
 {
-    public string $definition;
-    public array $arguments;
+    private string $definition;
+    private array $arguments;
+    private $messageCentre;
+    private $param;
+    private $value;
+    private $request;
+    public WP_Error $error;
 
-
-    public function __construct($ruleItem, $param, $value, $request)
+    public function __construct($ruleItem, $param, $value, $messageCentre, $request)
     {
         $this->definition = $this->resolveDefinition($ruleItem);
         $this->arguments = $this->resolveArguments($ruleItem);
+        $this->messageCentre = $messageCentre;
+        $this->param = $param;
+        $this->value = $value;
+        $this->request = $request;
 
         if (method_exists($this, $this->definition)) {
+            $this->{$this->definition}();
         }
     }
 
@@ -30,18 +41,33 @@ class ValidationRule
         return explode(",", $argString);
     }
 
-    private function required($value, $request, $param)
+    private function required()
     {
-        if (empty($value)) return new \WP_Error('validation_failed', $this->formatMessage('required', $value, $request, $param));
+        if (empty($this->value)) $this->error($this->formatMessage('required'));
     }
 
-    private function string($value, $request, $param)
+    private function string()
     {
-        if (!is_string($value)) return new \WP_Error('validation_failed', $this->formatMessage('string', $value, $request, $param));
+        if (!is_string($this->value)) $this->error($this->formatMessage('string'));
     }
 
-    private function array($value, $request, $param)
+    private function array()
     {
-        if (!is_array($value)) return new \WP_Error('validation_failed', $this->formatMessage('array', $value, $request, $param));
+        if (!is_array($this->value)) $this->error($this->formatMessage('array'));
+    }
+
+    private function error($message)
+    {
+        return new \WP_Error('validation_failed', $message);
+    }
+
+    private function formatMessage(string $ruleName, array $replacers = []): string
+    {
+        $message = $this->messageCentre->messages[$ruleName];
+        $replacers = array_merge($replacers, ['param' => $this->param, 'value' => $this->value]);
+        foreach ($replacers as $key => $replacer) {
+            $message = str_replace("%" . $key . "%", $replacer, $message);
+        }
+        return $message;
     }
 }

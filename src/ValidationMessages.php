@@ -16,7 +16,12 @@ class ValidationMessages
         return [
             'required' => '%param% is required',
             'string' => '%param% must be a string',
-            'array' => '%param% must be an array'
+            'array' => '%param% must be an array',
+            'boolean' => '%param% must be true or false',
+            'email' => 'Valid email address is required',
+            'unique' => '%value% already exists as a %param%',
+            'exists' => '%param% must exist on %args%',
+            'in' => '%param% must be one of %args%'
         ];
     }
 }

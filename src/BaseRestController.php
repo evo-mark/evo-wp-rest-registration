@@ -2,7 +2,6 @@
 
 namespace ScwWpRestRegistration;
 
-use Dotenv\Validator;
 use ScwWpRestRegistration\Validation;
 
 defined('ABSPATH') or exit;

@@ -12,7 +12,8 @@ class ValidationRule
     private $param;
     private $value;
     private $request;
-    public WP_Error $error;
+    public $error;
+    public bool $skip = false;
 
     public function __construct($ruleItem, $param, $value, $messageCentre, $request)
     {
@@ -43,28 +44,87 @@ class ValidationRule
 
     private function required()
     {
-        if (empty($this->value)) $this->error($this->formatMessage('required'));
+        if ($this->request->has_param($this->param) === false || empty($this->value)) $this->createError('required');
+    }
+
+    private function nullable()
+    {
+        if (empty($this->value)) $this->skip = true;
+    }
+
+    private function sometimes()
+    {
+        if ($this->request->has_param($this->param) === false) $this->skip = true;
     }
 
     private function string()
     {
-        if (!is_string($this->value)) $this->error($this->formatMessage('string'));
+        if (!is_string($this->value)) $this->createError('string');
     }
 
     private function array()
     {
-        if (!is_array($this->value)) $this->error($this->formatMessage('array'));
+        if (!is_array($this->value)) $this->createError('array');
     }
 
-    private function error($message)
+    private function in()
     {
-        return new \WP_Error('validation_failed', $message);
+        if (!in_array($this->value, $this->arguments)) $this->createError('in');
+    }
+
+    private function boolean()
+    {
+        if (!is_bool($this->value)) $this->createError('boolean');
+    }
+
+    private function email()
+    {
+        if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) $this->createError('email');
+    }
+
+    private function exists()
+    {
+        global $wpdb;
+
+        $column = $this->arguments[1] ?? $this->param;
+        $table = $wpdb->prefix . $this->arguments[0];
+
+        $prepared = $wpdb->prepare("SELECT COUNT(*) FROM `$table` WHERE `$column` = %s", [$this->value]);
+
+        $count = intval($wpdb->get_var($prepared));
+        if ($count === 0) {
+            $this->createError('exists');
+        }
+    }
+
+    private function unique()
+    {
+        global $wpdb;
+
+        $table = $wpdb->prefix . $this->arguments[0];
+        $column = $this->arguments[1] ?? $this->param;
+        $ignore = $this->arguments[2] ?? null;
+
+        $prepared = $wpdb->prepare("SELECT COUNT(*) FROM `$table` WHERE `$column` = %s", [$this->value]);
+        if ($ignore) {
+            $prepared .= " AND `id` != " . $this->request->get_param('id');
+        }
+
+        $count = intval($wpdb->get_var($prepared));
+        if ($count > 0) {
+            $this->createError('unique');
+        }
+    }
+
+    private function createError($ruleName)
+    {
+        $this->error = new \WP_Error('validation_failed', $this->formatMessage($ruleName));
     }
 
     private function formatMessage(string $ruleName, array $replacers = []): string
     {
         $message = $this->messageCentre->messages[$ruleName];
-        $replacers = array_merge($replacers, ['param' => $this->param, 'value' => $this->value]);
+        $replacers = array_merge($replacers, ['param' => ucwords($this->param), 'value' => $this->value, 'args' => implode(", ", $this->arguments)]);
         foreach ($replacers as $key => $replacer) {
             $message = str_replace("%" . $key . "%", $replacer, $message);
         }

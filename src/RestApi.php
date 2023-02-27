@@ -4,17 +4,12 @@ namespace ScwWpRestRegistration;
 
 class RestApi
 {
-    public static $base_url;
-    public static $version;
-    public static $namespace;
-    public static $directory;
+    public $base_url;
+    public $version;
+    public $namespace;
+    public $directory;
 
-    public static function prefix(): string
-    {
-        return self::$base_url . "/v" . self::$version;
-    }
-
-    public static function init(array $args = [])
+    public function __construct(array $args = [])
     {
         $required = ["base_url", "namespace", "directory"];
         foreach ($required as $item) {
@@ -23,12 +18,17 @@ class RestApi
             }
         }
 
-        self::$base_url = $args['base_url'];
-        self::$version = $args['version'] ?? 1;
-        self::$namespace = self::formatNamespace($args['namespace']);
-        self::$directory = self::formatDir($args['directory']);
+        $this->base_url = $args['base_url'];
+        $this->version = $args['version'] ?? 1;
+        $this->namespace = self::formatNamespace($args['namespace']);
+        $this->directory = self::formatDir($args['directory']);
 
-        add_action('rest_api_init', [__CLASS__, 'registerRoutes']);
+        add_action('rest_api_init', [$this, 'registerRoutes']);
+    }
+
+    public function prefix(): string
+    {
+        return $this->base_url . "/v" . $this->version;
     }
 
     public static function formatDir($dir)
@@ -61,19 +61,21 @@ class RestApi
         return str_replace(DIRECTORY_SEPARATOR, "\\", $path);
     }
 
-    public static function registerRoutes()
+    public function registerRoutes()
     {
-        foreach (self::rsearch(self::$directory, "/.*\.php$/") as $file) {
-            $class = self::$namespace . self::convertPathToClass($file);
+        foreach (self::rsearch($this->directory, "/.*\.php$/") as $file) {
+            $class = $this->namespace . self::convertPathToClass($file);
 
             if (class_exists($class)) {
                 $endpoint = new $class;
-                register_rest_route(self::prefix(), $endpoint->getPath(), [
+                register_rest_route($this->prefix(), $endpoint->getPath(), [
                     'args'  => $endpoint->getArguments(),
                     'callback'  => $endpoint->getCallback(),
                     'methods'   => $endpoint->getMethods(),
                     'permission_callback' => $endpoint->getPermissionCallback(),
                 ]);
+            } else {
+                dd($class);
             }
         }
     }

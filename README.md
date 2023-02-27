@@ -131,22 +131,48 @@ class CheckSomevar extends BaseRestController
 
 -   Rules are passed as an array of strings. Strings may be either `rulename` format, `rulename:arg` format or `rulename:arg,arg,arg` format. Arguments' function will vary depending on the rule in question.
 
-| Rule name | Arg                  | Arg 2    | Arg 3      | Description                                       |
-| --------- | -------------------- | -------- | ---------- | ------------------------------------------------- |
-| required  |                      |          |            | Param is required                                 |
-| nullable  |                      |          |            | Remaining rules are skipped if null value         |
-| sometimes |                      |          |            | Remaining rules are skipped if param not set      |
-| boolean   |                      |          |            | Must be either true or false                      |
-| string    |                      |          |            | Must be a string                                  |
-| email     |                      |          |            | Must be a valid email address                     |
-| url       | require (path,query) | as Arg 1 |            | Must be a valid URL                               |
-| json      |                      |          |            | Must be a decodable JSON string                   |
-| numeric   |                      |          |            | Must be a numeric value (int or float)            |
-| array     |                      |          |            | Must be an array                                  |
-| in        | val1                 | val2 etc |            | Value must be one of passed args                  |
-| exists    | table (no prefix)    | column   |            | Value must exist on the given table/column        |
-| unique    | table (no prefix)    | column   | exclude id | Value must _not_ exists on the given table/column |
+| Rule name | Arg                  | Arg 2    | Arg 3      | Description                                      |
+| --------- | -------------------- | -------- | ---------- | ------------------------------------------------ |
+| required  |                      |          |            | Param is required                                |
+| nullable  |                      |          |            | Remaining rules are skipped if null value        |
+| sometimes |                      |          |            | Remaining rules are skipped if param not set     |
+| boolean   |                      |          |            | Must be either true or false                     |
+| string    |                      |          |            | Must be a string                                 |
+| email     |                      |          |            | Must be a valid email address                    |
+| url       | require (path,query) | as Arg 1 |            | Must be a valid URL                              |
+| json      |                      |          |            | Must be a decodable JSON string                  |
+| numeric   |                      |          |            | Must be a numeric value (int or float)           |
+| array     |                      |          |            | Must be an array                                 |
+| in        | val1                 | val2 etc |            | Value must be one of passed args                 |
+| exists    | table (no prefix)    | column   |            | Value must exist on the given table/column       |
+| unique    | table (no prefix)    | column   | exclude id | Value must _not_ exist on the given table/column |
 
-### Note
+### Custom Messages
+
+By default, the follow error messages will be used:
+
+```php
+[
+    'required' => '%param% is required',
+    'string' => '%param% must be a string',
+    'numeric' => '%param% must be numeric',
+    'array' => '%param% must be an array',
+    'boolean' => '%param% must be true or false',
+    'email' => 'Valid email address is required',
+    'unique' => '%value% already exists as a %param%',
+    'exists' => '%param% must exist on %args%',
+    'in' => '%param% must be one of %args%',
+    'json' => '%param% must be a valid JSON string',
+    'url' => '%param% must be a valid URL'
+];
+```
+
+You can, however, override any of these by using the `messages` (protected) array on your controller. Any supplied rules will be merged in with the defaults.
+
+At present, your message can contain `%param%`, `%value%` or `%args%`, which will be replaced by their respective values.
+
+---
+
+## **Note**
 
 This package does not autoload your route classes. They will need to be registered before running the `init` function

@@ -18,6 +18,7 @@ Register your Wordpress REST API routes simply and easily.
 
 -   Automatic registration of your routes
 -   Base controller for easily creating object-orientated route files
+-   Rule-based validation for common types
 
 ---
 
@@ -25,11 +26,11 @@ Register your Wordpress REST API routes simply and easily.
 
 1. Run `composer require southcoastweb/scw-wp-rest-registration` at the root of your plugin or theme folder
 
-2. Call `RestApi::init();` in your plugin PHP entry file or theme `functions.php` file with the arguments below:
+2. Call `new RestApi([]);` in your plugin PHP entry file or theme `functions.php` file with the arguments below:
 
 ## Arguments
 
-`RestApi::init()` accepts the following arguments as part of a **single associative array**
+`new RestApi()` accepts the following arguments as part of a **single associative array**
 
 | Arg       | Required | Default | Description                               |
 | --------- | -------- | ------- | ----------------------------------------- |
@@ -41,7 +42,9 @@ Register your Wordpress REST API routes simply and easily.
 ### Example
 
 ```php
-RestApi::init([
+use ScwWpRestRegistration\RestApi;
+
+new RestApi([
     'namespace' => 'MyPlugin\\Admin\\RestApi\\',
     'version' => 1,
     'directory' => __DIR__ . '/src/Admin/RestApi',
@@ -72,6 +75,7 @@ class CheckSomevar extends BaseRestController
 
     public function __construct()
     {
+        // See https://developer.wordpress.org/rest-api/extending-the-rest-api/adding-custom-endpoints/#arguments
         $this->args = [
             'somevar' => [
                 'required' => true,
@@ -100,6 +104,48 @@ class CheckSomevar extends BaseRestController
     }
 }
 ```
+
+## Validation
+
+You can add a `rules` property to your controller to automatically validate parameters.
+
+```php
+class CheckSomevar extends BaseRestController
+{
+    protected $rules = [
+        'somevar' => ['required','numeric']
+    ]
+
+    public function handler()
+    {
+        $validated = $this->validated();
+
+        // Only fields with rules that have been passed will be on your validated parameters.
+
+        // Failure will result in a WP_Error('validation_failed') error being returned (HTTP status 400)
+    }
+}
+```
+
+### Available rules
+
+-   Rules are passed as an array of strings. Strings may be either `rulename` format, `rulename:arg` format or `rulename:arg,arg,arg` format. Arguments' function will vary depending on the rule in question.
+
+| Rule name | Arg                  | Arg 2    | Arg 3      | Description                                       |
+| --------- | -------------------- | -------- | ---------- | ------------------------------------------------- |
+| required  |                      |          |            | Param is required                                 |
+| nullable  |                      |          |            | Remaining rules are skipped if null value         |
+| sometimes |                      |          |            | Remaining rules are skipped if param not set      |
+| boolean   |                      |          |            | Must be either true or false                      |
+| string    |                      |          |            | Must be a string                                  |
+| email     |                      |          |            | Must be a valid email address                     |
+| url       | require (path,query) | as Arg 1 |            | Must be a valid URL                               |
+| json      |                      |          |            | Must be a decodable JSON string                   |
+| numeric   |                      |          |            | Must be a numeric value (int or float)            |
+| array     |                      |          |            | Must be an array                                  |
+| in        | val1                 | val2 etc |            | Value must be one of passed args                  |
+| exists    | table (no prefix)    | column   |            | Value must exist on the given table/column        |
+| unique    | table (no prefix)    | column   | exclude id | Value must _not_ exists on the given table/column |
 
 ### Note
 

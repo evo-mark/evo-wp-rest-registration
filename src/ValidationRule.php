@@ -62,6 +62,11 @@ class ValidationRule
         if (!is_string($this->value)) $this->createError('string');
     }
 
+    private function numeric()
+    {
+        if (!is_numeric($this->value)) $this->createError('numeric');
+    }
+
     private function array()
     {
         if (!is_array($this->value)) $this->createError('array');
@@ -80,6 +85,19 @@ class ValidationRule
     private function email()
     {
         if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) $this->createError('email');
+    }
+
+    private function json()
+    {
+        if (is_null(json_decode($this->value))) $this->createError('json');
+    }
+
+    private function url()
+    {
+        $filters = [FILTER_VALIDATE_URL];
+        if (in_array('path', $this->arguments)) $filters[] = FILTER_FLAG_PATH_REQUIRED;
+        if (in_array('query', $this->arguments)) $filters[] = FILTER_FLAG_QUERY_REQUIRED;
+        if (!filter_var($this->value, ...$filters)) $this->createError('url');
     }
 
     private function exists()

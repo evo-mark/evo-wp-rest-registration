@@ -23,7 +23,7 @@ class Validation
     {
         // Loop through rules and create a `validate_callback` callable
         foreach ($this->rules as $key => $ruleSet) {
-            $this->args[$key]['required'] = in_array('required', $ruleSet);
+            $this->args[$key]['required'] = in_array('required', $ruleSet) && !in_array('sometimes', $ruleSet);
             $this->args[$key]['validate_callback'] = $this->validationCallback($ruleSet);
         }
         return $this->args;

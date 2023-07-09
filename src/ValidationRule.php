@@ -142,7 +142,7 @@ class ValidationRule
     private function formatMessage(string $ruleName, array $replacers = []): string
     {
         $message = $this->messageCentre->messages[$ruleName];
-        $replacers = array_merge($replacers, ['param' => ucwords(str_replace('_', '', $this->param)), 'value' => $this->value, 'args' => implode(", ", $this->arguments)]);
+        $replacers = array_merge($replacers, ['param' => ucwords(str_replace('_', ' ', $this->param)), 'value' => $this->value, 'args' => implode(", ", $this->arguments)]);
         foreach ($replacers as $key => $replacer) {
             $message = str_replace("%" . $key . "%", $replacer, $message);
         }

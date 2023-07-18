@@ -17,17 +17,17 @@
 	"authors": [
 		{
 			"name": "Craig Riley",
-			"email": "c.riley@southcoastweb.co.uk",
+			"email": "c.riley@evomark.co.uk",
 			"homepage": "https://craigriley.uk"
 		}
 	],
 	"support": {
-		"issues": "https://github.com/South-Coast-Web/scw-wp-rest-registration/issues",
-		"source": "https://github.com/South-Coast-Web/scw-wp-rest-registration"
+		"issues": "https://github.com/evo-mark/evo-wp-rest-registration/issues",
+		"source": "https://github.com/evo-mark/evo-wp-rest-registration"
 	},
 	"autoload": {
 		"psr-4": {
-			"ScwWpRestRegistration\\": "src/"
+			"EvoWpRestRegistration\\": "src/"
 		}
 	}
 }

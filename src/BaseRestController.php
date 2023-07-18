@@ -2,7 +2,7 @@
 
 namespace EvoWpRestRegistration;
 
-use ScwWpRestRegistration\Validation;
+use EvoWpRestRegistration\Validation;
 
 defined('ABSPATH') or exit;
 

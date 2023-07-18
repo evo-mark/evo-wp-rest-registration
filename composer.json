@@ -1,5 +1,5 @@
 {
-	"name": "southcoastweb/scw-wp-rest-registration",
+	"name": "evo-mark/evo-wp-rest-registration",
 	"description": "Register your Wordpress REST API endpoints easily",
 	"license": "MIT",
 	"type": "library",

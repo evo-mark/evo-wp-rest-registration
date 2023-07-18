@@ -1,6 +1,6 @@
 <?php
 
-namespace ScwWpRestRegistration;
+namespace EvoWpRestRegistration;
 
 class ValidationMessages
 {

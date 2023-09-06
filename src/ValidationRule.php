@@ -57,6 +57,13 @@ class ValidationRule
         if ($this->request->has_param($this->param) === false) $this->skip = true;
     }
 
+    private function accepted()
+    {
+        $acceptedValues = ['yes', 'on', '1', 'true'];
+            
+        if (!in_array(strtolower($this->value), $acceptedValues, true)) $this->createError('accepted');
+    }
+
     private function string()
     {
         if (!is_string($this->value)) $this->createError('string');

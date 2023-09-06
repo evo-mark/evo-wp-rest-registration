@@ -16,6 +16,7 @@ class ValidationMessages
         return [
             'required' => '%param% is required',
             'string' => '%param% must be a string',
+            'accepted' => 'You must accept the %param%',
             'numeric' => '%param% must be numeric',
             'array' => '%param% must be an array',
             'boolean' => '%param% must be true or false',

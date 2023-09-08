@@ -151,6 +151,14 @@ class ValidationRule
         $message = $this->messageCentre->messages[$ruleName];
         $replacers = array_merge($replacers, ['param' => ucwords(str_replace('_', ' ', $this->param)), 'value' => $this->value, 'args' => implode(", ", $this->arguments)]);
         foreach ($replacers as $key => $replacer) {
+            if (is_string($replacer) === false) {
+                if (is_array($replacer) && empty($replacer)) {
+                    $replacer = "";
+                }
+                else if (is_array($replacer) || is_object($replacer)) {
+                    $replacer = json_encode($replacer);
+                }
+            }
             $message = str_replace("%" . $key . "%", $replacer, $message);
         }
         return $message;

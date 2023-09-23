@@ -25,13 +25,14 @@ class Validation
         foreach ($this->rules as $key => $ruleSet) {
             $this->args[$key]['required'] = in_array('required', $ruleSet) && !in_array('sometimes', $ruleSet);
             $this->args[$key]['validate_callback'] = $this->validationCallback($ruleSet);
+            $this->args[$key]['sanitize_callback'] = $this->sanitisationCallback($ruleSet);
         }
         return $this->args;
     }
 
-    /** 
+    /**
      * Generates a callback that is used as the `validate_callback` property on the arg
-     * 
+     *
      * Seems to only be called when a value is set on the request
      */
     public function validationCallback(array $ruleSet): callable
@@ -47,6 +48,22 @@ class Validation
             }
             // Set the value on the validated array for use in the controller
             $this->validated[$param] = $value;
+        };
+    }
+
+    /**
+     * ValidationCallback isn't run on null values, so we use this callback to register them
+     */
+    public function sanitisationCallback(array $ruleSet): callable
+    {
+        return function ($value, $request, $param) use ($ruleSet) {
+            if (in_array('nullable', $ruleSet)) {
+                if (in_array('string', $ruleSet) && !$value) {
+                    $this->validated[$param] = null;
+                }
+            }
+
+            return $value;
         };
     }
 }

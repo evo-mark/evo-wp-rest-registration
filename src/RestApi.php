@@ -31,23 +31,23 @@ class RestApi
         return $this->base_url . "/v" . $this->version;
     }
 
-    public static function formatDir($dir)
+    public static function formatDir($dir): string
     {
         return rtrim($dir, '/') . '/';
     }
 
-    public static function formatNamespace($ns)
+    public static function formatNamespace($ns): string
     {
         return rtrim($ns, "\\") . "\\";
     }
 
-    public static function rsearch($folder, $pattern)
+    public static function rsearch($folder, $pattern): array
     {
         $dir = new \RecursiveDirectoryIterator($folder);
         $ite = new \RecursiveIteratorIterator($dir);
         $files = new \RegexIterator($ite, $pattern, \RegexIterator::GET_MATCH);
 
-        $fileList = array();
+        $fileList = [];
         foreach ($files as $file) {
             $file = str_replace($folder, "", $file);
             $fileList = array_merge($fileList, $file);
@@ -55,13 +55,13 @@ class RestApi
         return $fileList;
     }
 
-    public static function convertPathToClass($path, $ext = ".php")
+    public static function convertPathToClass($path, $ext = ".php"): string
     {
         $path = str_replace($ext, "", $path);
         return str_replace(DIRECTORY_SEPARATOR, "\\", $path);
     }
 
-    public function registerRoutes()
+    public function registerRoutes(): void
     {
         foreach (self::rsearch($this->directory, "/.*\.php$/") as $file) {
             $class = $this->namespace . self::convertPathToClass($file);

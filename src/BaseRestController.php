@@ -3,6 +3,7 @@
 namespace EvoWpRestRegistration;
 
 use EvoWpRestRegistration\Validation;
+use WP_REST_Server;
 
 defined('ABSPATH') or exit;
 
@@ -15,27 +16,36 @@ abstract class BaseRestController
     protected array $messages = [];
     public $validator;
 
-    public function getPath()
+    /**
+     * Registers the REST endpoint's sanitised path
+     */
+    public function getPath(): string
     {
         return rtrim($this->path, '/') . '/';
     }
 
-    public function getMethods()
+    /**
+     * Registers the REST endpoint's `methods` property
+     */
+    public function getMethods(): string
     {
-        return $this->methods;
+        return $this->methods ?? WP_REST_Server::READABLE;
     }
 
-    public function getCallback()
+    /**
+     * Registers the REST endpoint's `callback` property
+     */
+    public function getCallback(): callable
     {
         return [$this, 'handler'];
     }
 
-    public function getPermissionCallback()
+    public function getPermissionCallback(): callable
     {
         return [$this, 'authorise'];
     }
 
-    public function getArguments()
+    public function getArguments(): array
     {
         if (!empty($this->rules)) {
             $this->validator = new Validation($this->rules, $this->args, new ValidationMessages($this->messages));

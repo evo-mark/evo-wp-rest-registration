@@ -1,14 +1,17 @@
-<a href="https://southcoastweb.co.uk" target="_blank" alt="Link to southcoastweb's website">
+<a href="https://evomark.co.uk" target="_blank" alt="Link to evoMark's website" style="text-align:center;display:block">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://southcoastweb.co.uk/app/logo-dark.svg">
-      <source media="(prefers-color-scheme: light)" srcset="https://southcoastweb.co.uk/app/logo.svg">
-      <img alt="southcoastweb company logo" src="https://southcoastweb.co.uk/app/logo.svg">
+      <source media="(prefers-color-scheme: dark)" srcset="https://evomark.co.uk/wp-content/uploads/static/evomark-logo--dark.svg">
+      <source media="(prefers-color-scheme: light)" srcset="https://evomark.co.uk/wp-content/uploads/static/evomark-logo--light.svg">
+      <img alt="evoMark company logo" src="https://evomark.co.uk/wp-content/uploads/static/evomark-logo--light.svg" style="max-height: 50px; max-width:100%">
     </picture>
 </a>
-
-<a href="https://packagist.org/packages/southcoastweb/scw-wp-rest-registration"><img src="https://img.shields.io/packagist/v/southcoastweb/scw-wp-rest-registration?logo=packagist&logoColor=white" alt="Build status" /></a>
-<a href="https://packagist.org/packages/southcoastweb/scw-wp-rest-registration"><img src="https://img.shields.io/packagist/dt/southcoastweb/scw-wp-rest-registration" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/southcoastweb/scw-wp-rest-registration"><img src="https://img.shields.io/packagist/l/southcoastweb/scw-wp-rest-registration" alt="License"></a>
+<br />
+<p align="center">
+    <a href="https://packagist.org/packages/evo-mark/evo-wp-rest-registration"><img src="https://img.shields.io/packagist/v/evo-mark/evo-wp-rest-registration?logo=packagist&logoColor=white" alt="Build status" /></a>
+    <a href="https://packagist.org/packages/evo-mark/evo-wp-rest-registration"><img src="https://img.shields.io/packagist/dt/evo-mark/evo-wp-rest-registration" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/evo-mark/evo-wp-rest-registration"><img src="https://img.shields.io/packagist/l/evo-mark/evo-wp-rest-registration" alt="License"></a>
+</p>
+<br />
 
 # WP REST Registration
 

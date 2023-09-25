@@ -14,7 +14,7 @@ class RestApi
         $required = ["base_url", "namespace", "directory"];
         foreach ($required as $item) {
             if (!isset($args[$item]) || empty($args[$item])) {
-                throw new \Exception("SCW WP Rest Registration: no " . $item . " provided");
+                throw new \Exception("Evo WP Rest Registration: no " . $item . " provided");
             }
         }
 

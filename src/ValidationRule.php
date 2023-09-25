@@ -44,7 +44,7 @@ class ValidationRule
 
     private function required()
     {
-        if ($this->request->has_param($this->param) === false || empty($this->value)) $this->createError('required');
+        if ($this->request->has_param($this->param) === false) $this->createError('required');
     }
 
     private function nullable()
@@ -60,7 +60,7 @@ class ValidationRule
     private function accepted()
     {
         $acceptedValues = ['yes', 'on', '1', 'true'];
-            
+
         if (!in_array(strtolower($this->value), $acceptedValues, true)) $this->createError('accepted');
     }
 
@@ -154,8 +154,7 @@ class ValidationRule
             if (is_string($replacer) === false) {
                 if (is_array($replacer) && empty($replacer)) {
                     $replacer = "";
-                }
-                else if (is_array($replacer) || is_object($replacer)) {
+                } else if (is_array($replacer) || is_object($replacer)) {
                     $replacer = json_encode($replacer);
                 }
             }

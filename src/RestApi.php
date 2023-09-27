@@ -73,9 +73,10 @@ class RestApi
                     'callback'  => $endpoint->getCallback(),
                     'methods'   => $endpoint->getMethods(),
                     'permission_callback' => $endpoint->getPermissionCallback(),
+                    'show_in_index' => $endpoint->showInIndex()
                 ]);
             } else {
-                dd($class);
+                wp_die("Couldn't find the class $class to register the REST route");
             }
         }
     }

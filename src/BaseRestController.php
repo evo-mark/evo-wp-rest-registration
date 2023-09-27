@@ -9,12 +9,13 @@ defined('ABSPATH') or exit;
 
 abstract class BaseRestController
 {
+    public $validator;
     protected $path;
     protected $methods;
-    protected array $args = [];
+    protected bool $indexed = false;
     protected $rules = [];
+    protected array $args = [];
     protected array $messages = [];
-    public $validator;
 
     /**
      * Registers the REST endpoint's sanitised path
@@ -61,5 +62,10 @@ abstract class BaseRestController
     public function validated(): array
     {
         return $this->validator->validated ?? [];
+    }
+
+    public function showInIndex(): bool
+    {
+        return $this->indexed === true;
     }
 }

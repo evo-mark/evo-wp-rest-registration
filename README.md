@@ -7,7 +7,6 @@
         </picture>
     </a>
 </p>
-<br />
 <p align="center">
     <a href="https://packagist.org/packages/evo-mark/evo-wp-rest-registration"><img src="https://img.shields.io/packagist/v/evo-mark/evo-wp-rest-registration?logo=packagist&logoColor=white" alt="Build status" /></a>
     <a href="https://packagist.org/packages/evo-mark/evo-wp-rest-registration"><img src="https://img.shields.io/packagist/dt/evo-mark/evo-wp-rest-registration" alt="Total Downloads"></a>

@@ -16,10 +16,10 @@
 
 # WP REST Registration
 
-## by [southcoastweb](https://southcoastweb.co.uk)
+## by [evoMark](https://evomark.co.uk)
 
 Register your Wordpress REST API routes simply and easily.
 
 ---
 
-For full installation instructions and documentation, please visit [southcoastweb](https://southcoastweb.co.uk/open-source-software/wp-rest-registration/).
+For full installation instructions and documentation, please visit [evoMark](https://evomark.co.uk/open-source-software/wp-rest-registration/).

@@ -44,7 +44,7 @@ class ValidationRule
 
     private function required()
     {
-        if ($this->request->has_param($this->param) === false) $this->createError('required');
+        if ($this->request->has_param($this->param) === false || empty($this->value)) $this->createError('required');
     }
 
     private function nullable()

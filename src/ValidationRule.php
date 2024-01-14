@@ -158,7 +158,7 @@ class ValidationRule
                     $replacer = json_encode($replacer);
                 }
             }
-            $message = str_replace("%" . $key . "%", $replacer, $message);
+            $message = str_replace("%" . $key . "%", $replacer ?? "", $message);
         }
         return $message;
     }

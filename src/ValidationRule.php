@@ -74,6 +74,22 @@ class ValidationRule
         if (!is_numeric($this->value)) $this->createError('numeric');
     }
 
+    private function min()
+    {
+        $value = floatval($this->value);
+        $bound = floatval($this->arguments[1] ?? $this->param);
+
+        if ($value < $bound) $this->createError('min');
+    }
+
+    private function max()
+    {
+        $value = floatval($this->value);
+        $bound = floatval($this->arguments[1] ?? $this->param);
+
+        if ($value > $bound) $this->createError('max');
+    }
+
     private function array()
     {
         if (!is_array($this->value)) $this->createError('array');

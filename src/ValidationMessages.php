@@ -25,7 +25,9 @@ class ValidationMessages
             'exists' => '%param% must exist on %args%',
             'in' => '%param% must be one of %args%',
             'json' => '%param% must be a valid JSON string',
-            'url' => '%param% must be a valid URL'
+            'url' => '%param% must be a valid URL',
+            'min' => '%param% must be at least %args%',
+            'max' => '%param% must be no more than %args%',
         ];
     }
 }

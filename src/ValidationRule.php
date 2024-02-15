@@ -77,7 +77,7 @@ class ValidationRule
     private function min()
     {
         $value = floatval($this->value);
-        $bound = floatval($this->arguments[1] ?? $this->param);
+        $bound = floatval($this->arguments[0] ?? $this->param);
 
         if ($value < $bound) $this->createError('min');
     }
@@ -85,7 +85,7 @@ class ValidationRule
     private function max()
     {
         $value = floatval($this->value);
-        $bound = floatval($this->arguments[1] ?? $this->param);
+        $bound = floatval($this->arguments[0] ?? $this->param);
 
         if ($value > $bound) $this->createError('max');
     }

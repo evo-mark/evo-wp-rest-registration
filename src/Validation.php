@@ -58,7 +58,7 @@ class Validation
     {
         return function ($value, $request, $param) use ($ruleSet) {
             if (in_array('nullable', $ruleSet)) {
-                if (in_array('string', $ruleSet) && !$value) {
+                if ((in_array('string', $ruleSet) || in_array('integer', $ruleSet)) && !$value) {
                     $this->validated[$param] = null;
                 }
             }

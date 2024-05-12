@@ -38,6 +38,7 @@ class Validation
     public function validationCallback(array $ruleSet): callable
     {
         return function ($value, $request, $param) use ($ruleSet) {
+            $value = $this->prepareValue($value, $param, $ruleSet);
             foreach ($ruleSet as $ruleItem) {
                 $ruleResolver = new ValidationRule($ruleItem, $param, $value, $this->messageCentre, $request);
                 if ($ruleResolver->error) {
@@ -65,5 +66,18 @@ class Validation
 
             return $value;
         };
+    }
+
+    private function prepareValue($value, $param, $ruleSet)
+    {
+        if (in_array('array', $ruleSet) && is_array($value) === false) {
+            $value = array_filter(explode(",", $value));
+        } else if (in_array('boolean', $ruleSet)) {
+            $value = boolval($value);
+        } else if (in_array('string', $ruleSet)) {
+            $value = strval($value);
+        }
+
+        return $value;
     }
 }

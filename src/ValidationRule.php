@@ -32,7 +32,8 @@ class ValidationRule
     public function resolveDefinition(string $ruleItem): string
     {
         $exploded = explode(":", $ruleItem);
-        return array_shift($exploded);
+        $first = array_shift($exploded);
+        return $first;
     }
 
     public function resolveArguments(string $ruleItem): array

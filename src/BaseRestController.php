@@ -28,7 +28,7 @@ abstract class BaseRestController
     /**
      * Registers the REST endpoint's `methods` property
      */
-    public function getMethods(): string
+    public function getMethods(): string|array
     {
         return $this->methods ?? WP_REST_Server::READABLE;
     }

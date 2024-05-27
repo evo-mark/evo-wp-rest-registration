@@ -29,11 +29,21 @@ class ValidationRule
         }
     }
 
+    private function convertSnakeToCamel(string $str): string
+    {
+        $words = explode('_', $str);
+        $camelCaseString = $words[0];
+        for ($i = 1; $i < count($words); $i++) {
+            $camelCaseString .= ucfirst($words[$i]);
+        }
+        return $camelCaseString;
+    }
+
     public function resolveDefinition(string $ruleItem): string
     {
         $exploded = explode(":", $ruleItem);
         $first = array_shift($exploded);
-        return $first;
+        return $this->convertSnakeToCamel($first);
     }
 
     public function resolveArguments(string $ruleItem): array
@@ -70,6 +80,74 @@ class ValidationRule
         if (!is_string($this->value)) $this->createError('string');
     }
 
+    private function lowercase()
+    {
+        if (strtolower($this->value) !== $this->value) $this->createError('lowercase');
+    }
+
+    private function uppercase()
+    {
+        if (strtoupper($this->value) !== $this->value) $this->createError('lowercase');
+    }
+
+    private function startsWith()
+    {
+        $found = false;
+        $needles = is_iterable($this->arguments) ? $this->arguments : [$this->arguments];
+
+        foreach ($needles as $needle) {
+            if ((string) $needle !== '' && str_starts_with($this->value, $needle)) {
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) $this->createError('starts_with');
+    }
+
+    private function endsWith()
+    {
+        $found = false;
+        $needles = is_iterable($this->arguments) ? $this->arguments : [$this->arguments];
+
+        foreach ($needles as $needle) {
+            if ((string) $needle !== '' && str_ends_with($this->value, $needle)) {
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) $this->createError('ends_with');
+    }
+
+    private function alphaUnderscore()
+    {
+        if ((!is_string($this->value) && !is_numeric($this->value)) || preg_match('/\A[a-zA-Z_]+\z/u', $this->value) === 0) {
+            $this->createError('alpha_underscore');
+        };
+    }
+
+    private function alphaDash()
+    {
+        if ((!is_string($this->value) && !is_numeric($this->value)) || preg_match('/\A[a-zA-Z-]+\z/u', $this->value) === 0) {
+            $this->createError('alpha_dash');
+        };
+    }
+
+    private function alphaNum()
+    {
+        if ((!is_string($this->value) && !is_numeric($this->value)) || preg_match('/\A[a-zA-Z0-9]+\z/u', $this->value) === 0) {
+            $this->createError('alpha_num');
+        };
+    }
+
+    private function hexColour()
+    {
+        if (preg_match('/^#(?:(?:[0-9a-f]{3}){1,2}|(?:[0-9a-f]{4}){1,2})$/i', $this->value) === 0) {
+            $this->createError('hex_colour');
+        }
+    }
+
     private function numeric()
     {
         if (!is_numeric($this->value)) $this->createError('numeric');
@@ -99,6 +177,11 @@ class ValidationRule
     private function in()
     {
         if (!in_array($this->value, $this->arguments)) $this->createError('in');
+    }
+
+    private function notIn()
+    {
+        if (in_array($this->value, $this->arguments)) $this->createError('not_in');
     }
 
     private function boolean()

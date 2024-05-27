@@ -24,10 +24,19 @@ class ValidationMessages
             'unique' => '%value% already exists as a %param%',
             'exists' => '%param% must exist on %args%',
             'in' => '%param% must be one of %args%',
+            'not_in' => '%param% must be not be any of %args%',
             'json' => '%param% must be a valid JSON string',
             'url' => '%param% must be a valid URL',
             'min' => '%param% must be at least %args%',
             'max' => '%param% must be no more than %args%',
+            'lowercase' => '%param% must be lowercase',
+            'uppercase' => '%param% must be uppercase',
+            'starts_with' => '%param% must start with one of the following: %args%',
+            'ends_with' => '%param% must end with one of the following: %args%',
+            'alpha_underscore' => '%param% can only contain letters and underscores',
+            'alpha_dash' => '%param% can only contain letters and hyphens',
+            'alpha_num' => '%param% can only contain letters and numbers',
+            'hex_colour' => '%param% must be a hex colour'
         ];
     }
 }

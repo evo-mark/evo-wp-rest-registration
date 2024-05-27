@@ -70,7 +70,7 @@ class Validation
 
     private function prepareValue($value, $param, $ruleSet)
     {
-        if (in_array('array', $ruleSet) && is_array($value) === false) {
+        if (in_array('array', $ruleSet) && is_string($value) === true) {
             $value = array_filter(explode(",", $value));
         } else if (in_array('boolean', $ruleSet)) {
             $value = boolval($value);

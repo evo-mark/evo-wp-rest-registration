@@ -28,7 +28,9 @@ class ValidationMessages
             'json' => '%param% must be a valid JSON string',
             'url' => '%param% must be a valid URL',
             'min' => '%param% must be at least %args%',
+            'min_filesize' => '%param% must be at least %args% KB',
             'max' => '%param% must be no more than %args%',
+            'max_filesize' => '%param% must be less than %args% KB',
             'lowercase' => '%param% must be lowercase',
             'uppercase' => '%param% must be uppercase',
             'starts_with' => '%param% must start with one of the following: %args%',
@@ -36,7 +38,10 @@ class ValidationMessages
             'alpha_underscore' => '%param% can only contain letters and underscores',
             'alpha_dash' => '%param% can only contain letters and hyphens',
             'alpha_num' => '%param% can only contain letters and numbers',
-            'hex_colour' => '%param% must be a hex colour'
+            'hex_colour' => '%param% must be a hex colour',
+            'file' => '%param% must be a valid file',
+            'extensions' => '%param% must be a file with extension of %args%',
+            'mimetypes' => '%param% must be a file with a mime type of %args%'
         ];
     }
 }

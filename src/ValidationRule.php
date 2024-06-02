@@ -3,6 +3,7 @@
 namespace EvoWpRestRegistration;
 
 use \WP_Error;
+use WP_REST_Request;
 
 class ValidationRule
 {
@@ -11,7 +12,7 @@ class ValidationRule
     private $messageCentre;
     private $param;
     private $value;
-    private $request;
+    private WP_REST_Request $request;
     public $error;
     public bool $skip = false;
 
@@ -73,6 +74,43 @@ class ValidationRule
         $acceptedValues = ['yes', 'on', '1', 'true'];
 
         if (!in_array(strtolower($this->value), $acceptedValues, true)) $this->createError('accepted');
+    }
+
+    private function file()
+    {
+        if (
+            !$this->_isFile($this->param) ||
+            !$this->_valueHasKeys($this->value, ['name', 'full_path', 'type', 'size', 'error']) ||
+            $this->value['error']
+        ) {
+            $this->createError('file');
+        }
+    }
+
+    private function _isFile($param)
+    {
+        $files = $this->request->get_file_params();
+        return isset($files[$param]);
+    }
+
+    private function extensions()
+    {
+        $error = false;
+        if (!isset($this->value['full_path'])) $error = true;
+
+        if (!$error) {
+            $fileInfo = pathinfo($this->value['full_path']);
+            $extension = isset($fileInfo['extension']) ? $fileInfo['extension'] : '';
+        }
+
+        if ($error === true || !in_array($extension, $this->arguments)) $this->createError('extensions');
+    }
+
+    private function mimetypes()
+    {
+        if (!isset($this->value['type']) || in_array($this->value['type'], $this->arguments) === false) {
+            $this->createError('mimetypes');
+        }
     }
 
     private function string()
@@ -155,18 +193,28 @@ class ValidationRule
 
     private function min()
     {
-        $value = floatval($this->value);
         $bound = floatval($this->arguments[0] ?? $this->param);
 
-        if ($value < $bound) $this->createError('min');
+        if ($this->_isFile($this->param)) {
+            $value = floatval($this->value['size']) / 1024;
+            if ($value < $bound) $this->createError('min_filesize');
+        } else {
+            $value = floatval($this->value);
+            if ($value < $bound) $this->createError('min');
+        }
     }
 
     private function max()
     {
-        $value = floatval($this->value);
         $bound = floatval($this->arguments[0] ?? $this->param);
 
-        if ($value > $bound) $this->createError('max');
+        if ($this->_isFile($this->param)) {
+            $value = floatval($this->value['size']) / 1024;
+            if ($value > $bound) $this->createError('max_filesize');
+        } else {
+            $value = floatval($this->value);
+            if ($value > $bound) $this->createError('max');
+        }
     }
 
     private function array()
@@ -239,6 +287,16 @@ class ValidationRule
         if ($count > 0) {
             $this->createError('unique');
         }
+    }
+
+    private function _valueHasKeys(array $value, array $keys)
+    {
+        foreach ($keys as $key) {
+            if (!array_key_exists($key, $value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function createError($ruleName)

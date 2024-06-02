@@ -17,6 +17,19 @@ class Validation
         $this->rules = $rules;
         $this->args = $args;
         $this->messageCentre = $messages;
+
+        add_filter('rest_pre_dispatch', [$this, '_processRequest'], 10, 3);
+    }
+
+    public function _processRequest($result, $server, $request)
+    {
+        $files = $request->get_file_params();
+        if (!empty($files)) {
+            foreach ($files as $key => $file) {
+                $request->set_param($key, $file);
+            }
+        }
+        $this->request = $request;
     }
 
     public function createValidationCallback()

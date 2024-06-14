@@ -2,6 +2,8 @@
 
 namespace EvoWpRestRegistration;
 
+use Illuminate\Support\Str;
+
 class RestApi
 {
     public $base_url;
@@ -24,8 +26,38 @@ class RestApi
         $this->directory = self::formatDir($args['directory']);
 
         add_action('rest_api_init', [$this, 'registerRoutes']);
+        add_filter('rest_pre_dispatch', [$this, '_processRequest'], 10, 3);
     }
 
+    /**
+     * Check that the incoming request is for a route matching this prefix
+     */
+    private function requestMatchesPrefix($request): bool
+    {
+        $requestRoute = str($request->get_route())->trim("/ ")->lower()->value;
+        $prefix = str($this->prefix())->lower()->value;
+        return Str::startsWith($requestRoute, $prefix);
+    }
+
+    /**
+     * Move files to the main parameter array to allow their validation
+     */
+    public function _processRequest($result, $server, $request)
+    {
+        if ($this->requestMatchesPrefix($request)) {
+            $files = $request->get_file_params();
+            if (!empty($files)) {
+                foreach ($files as $key => $file) {
+                    $request->set_param($key, $file);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get the REST route prefix
+     */
     public function prefix(): string
     {
         return $this->base_url . "/v" . $this->version;
@@ -63,12 +95,15 @@ class RestApi
 
     public function registerRoutes(): void
     {
-        foreach (self::rsearch($this->directory, "/.*\.php$/") as $file) {
+        $routeFiles = collect(self::rsearch($this->directory, "/.*\.php$/"))->reverse();
+        $count = 0;
+        foreach ($routeFiles as $file) {
             $class = $this->namespace . self::convertPathToClass($file);
 
             if (class_exists($class)) {
                 $endpoint = new $class;
-                register_rest_route($this->prefix(), $endpoint->getPath(), [
+
+                register_rest_route($this->prefix(), Str::start($endpoint->getPath(), "/"), [
                     'args'  => $endpoint->getArguments(),
                     'callback'  => $endpoint->getCallback(),
                     'methods'   => $endpoint->getMethods(),
@@ -78,6 +113,7 @@ class RestApi
             } else {
                 wp_die("Couldn't find the class $class to register the REST route");
             }
+            $count++;
         }
     }
 }

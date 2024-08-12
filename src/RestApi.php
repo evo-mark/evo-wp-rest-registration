@@ -10,6 +10,7 @@ class RestApi
     public $version;
     public $namespace;
     public $directory;
+    protected $processRequestCallback;
 
     public function __construct(array $args = [])
     {
@@ -24,6 +25,7 @@ class RestApi
         $this->version = $args['version'] ?? 1;
         $this->namespace = self::formatNamespace($args['namespace']);
         $this->directory = self::formatDir($args['directory']);
+        $this->processRequestCallback = $args['process_request_callback'] ?? null;
 
         add_action('rest_api_init', [$this, 'registerRoutes']);
         add_filter('rest_pre_dispatch', [$this, '_processRequest'], 10, 3);
@@ -45,10 +47,14 @@ class RestApi
     public function _processRequest($result, $server, $request)
     {
         if ($this->requestMatchesPrefix($request)) {
-            $files = $request->get_file_params();
-            if (!empty($files)) {
-                foreach ($files as $key => $file) {
-                    $request->set_param($key, $file);
+            if (is_callable($this->processRequestCallback)) {
+                call_user_func($this->processRequestCallback, $request, $server);
+            } else {
+                $files = $request->get_file_params();
+                if (!empty($files)) {
+                    foreach ($files as $key => $file) {
+                        $request->set_param($key, $file);
+                    }
                 }
             }
         }

@@ -10,13 +10,15 @@ class Validation
     public $validated;
     public $request;
     protected $messageCentre;
+    protected $filePrefix;
 
-    public function __construct($rules, $args, $messages)
+    public function __construct($rules, $args, $messages, $options = [])
     {
         $this->validated = [];
         $this->rules = $rules;
         $this->args = $args;
         $this->messageCentre = $messages;
+        $this->filePrefix = $options['filePrefix'] ?? "";
     }
 
     public function createValidationCallback()
@@ -40,7 +42,9 @@ class Validation
         return function ($value, $request, $param) use ($ruleSet) {
             $value = $this->prepareValue($value, $param, $ruleSet);
             foreach ($ruleSet as $ruleItem) {
-                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $this->messageCentre, $request);
+                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $this->messageCentre, $request, [
+                    'filePrefix' => $this->filePrefix
+                ]);
                 if ($ruleResolver->error) {
                     return $ruleResolver->error;
                 } else if ($ruleResolver->skip === true) {

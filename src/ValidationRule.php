@@ -8,6 +8,7 @@ use WP_REST_Request;
 class ValidationRule
 {
     private string $definition;
+    private string $filePrefix;
     private array $arguments;
     private $messageCentre;
     private $param;
@@ -16,10 +17,11 @@ class ValidationRule
     public $error;
     public bool $skip = false;
 
-    public function __construct($ruleItem, $param, $value, $messageCentre, $request)
+    public function __construct($ruleItem, $param, $value, $messageCentre, $request, $options = [])
     {
         $this->definition = $this->resolveDefinition($ruleItem);
         $this->arguments = $this->resolveArguments($ruleItem);
+        $this->filePrefix = $options['filePrefix'] ?? "";
         $this->messageCentre = $messageCentre;
         $this->param = $param;
         $this->value = $value;
@@ -90,7 +92,7 @@ class ValidationRule
     private function _isFile($param)
     {
         $files = $this->request->get_file_params();
-        return isset($files[$param]);
+        return isset($files[$this->filePrefix . $param]);
     }
 
     private function extensions()

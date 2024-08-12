@@ -8,7 +8,6 @@ use WP_REST_Request;
 class ValidationRule
 {
     private string $definition;
-    private string $filePrefix;
     private array $arguments;
     private $messageCentre;
     private $param;
@@ -17,11 +16,10 @@ class ValidationRule
     public $error;
     public bool $skip = false;
 
-    public function __construct($ruleItem, $param, $value, $messageCentre, $request, $options = [])
+    public function __construct($ruleItem, $param, $value, $messageCentre, $request)
     {
         $this->definition = $this->resolveDefinition($ruleItem);
         $this->arguments = $this->resolveArguments($ruleItem);
-        $this->filePrefix = $options['filePrefix'] ?? "";
         $this->messageCentre = $messageCentre;
         $this->param = $param;
         $this->value = $value;
@@ -92,7 +90,9 @@ class ValidationRule
     private function _isFile($param)
     {
         $files = $this->request->get_file_params();
-        return isset($files[$this->filePrefix . $param]);
+        $prefix = apply_filters(Hooks::FILE_PREFIX, "", $param, $files, $this->request);
+        $param = $prefix . $param;
+        return isset($files[$param]);
     }
 
     private function extensions()
@@ -308,7 +308,7 @@ class ValidationRule
 
     private function formatMessage(string $ruleName, array $replacers = []): string
     {
-        $message = $this->messageCentre->messages[$ruleName];
+        $message = apply_filters(Hooks::PRE_VALIDATION_MESSAGE, $this->messageCentre->messages[$ruleName], $this->param, $ruleName);
         $replacers = array_merge($replacers, ['param' => ucwords(str_replace('_', ' ', $this->param)), 'value' => $this->value, 'args' => implode(", ", $this->arguments)]);
         foreach ($replacers as $key => $replacer) {
             if (is_string($replacer) === false) {
@@ -320,6 +320,6 @@ class ValidationRule
             }
             $message = str_replace("%" . $key . "%", $replacer ?? "", $message);
         }
-        return $message;
+        return apply_filters(Hooks::VALIDATION_MESSAGE, $message, $this->param, $ruleName);
     }
 }

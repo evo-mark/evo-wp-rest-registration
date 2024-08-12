@@ -11,7 +11,6 @@ abstract class BaseRestController
 {
     public $validator;
     protected $path;
-    protected $filePrefix;
     protected $methods;
     protected bool $indexed = false;
     protected $rules = [];
@@ -50,9 +49,7 @@ abstract class BaseRestController
     public function getArguments(): array
     {
         if (!empty($this->rules)) {
-            $this->validator = new Validation($this->rules, $this->args, new ValidationMessages($this->messages), [
-                'filePrefix' => $this->filePrefix
-            ]);
+            $this->validator = new Validation($this->rules, $this->args, new ValidationMessages($this->messages));
             return $this->validator->createValidationCallback();
         } else return $this->args ?? [];
     }

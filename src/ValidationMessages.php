@@ -8,7 +8,7 @@ class ValidationMessages
 
     public function __construct(array $userMessages = [])
     {
-        $this->messages = array_merge($this->defaults(), $userMessages);
+        $this->messages = apply_filters(Hooks::COMPILE_VALIDATION_MESSAGES, array_merge($this->defaults(), $userMessages));
     }
 
     private function defaults()

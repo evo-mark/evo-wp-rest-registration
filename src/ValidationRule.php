@@ -2,6 +2,7 @@
 
 namespace EvoWpRestRegistration;
 
+use DateTimeInterface;
 use \WP_Error;
 use WP_REST_Request;
 
@@ -288,6 +289,27 @@ class ValidationRule
         $count = intval($wpdb->get_var($prepared));
         if ($count > 0) {
             $this->createError('unique');
+        }
+    }
+
+    private function date()
+    {
+        if ($this->value instanceof DateTimeInterface) {
+            return true;
+        }
+
+        try {
+            if ((! is_string($this->value) && ! is_numeric($this->value)) || strtotime($this->value) === false) {
+                return $this->createError('date');
+            }
+        } catch (\Exception) {
+            return $this->createError('date');
+        }
+
+        $date = date_parse($this->value);
+
+        if (!checkdate($date['month'], $date['day'], $date['year'])) {
+            $this->createError('date');
         }
     }
 

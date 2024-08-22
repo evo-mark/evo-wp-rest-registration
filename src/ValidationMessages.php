@@ -41,7 +41,8 @@ class ValidationMessages
             'hex_colour' => '%param% must be a hex colour',
             'file' => '%param% must be a valid file',
             'extensions' => '%param% must be a file with extension of %args%',
-            'mimetypes' => '%param% must be a file with a mime type of %args%'
+            'mimetypes' => '%param% must be a file with a mime type of %args%',
+            'date' => '%param% must be a valid date'
         ];
     }
 }

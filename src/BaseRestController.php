@@ -59,8 +59,17 @@ abstract class BaseRestController
         return false;
     }
 
-    public function validated(): array
+    /**
+     * Return either the full validated array, or a field if given
+     * @param string $field The optional field to pick from the validated array
+     * @return mixed Either the whole validated array or a single field of it
+     */
+    public function validated(?string $field = null): mixed
     {
+        if (!empty($field)) {
+            return $this->validator->validated[$field] ?? null;
+        }
+
         return $this->validator->validated ?? [];
     }
 

@@ -23,3 +23,5 @@ Register your Wordpress REST API routes simply and easily.
 ---
 
 For full installation instructions and documentation, please visit [evoMark](https://evomark.co.uk/open-source-software/wp-rest-registration/).
+
+Migration instructions for v4 also available [Migrating to version 4](https://evomark.co.uk/open-source-software/wp-rest-registration/#page_heading_2)

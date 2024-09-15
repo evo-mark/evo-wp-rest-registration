@@ -2,8 +2,9 @@
 
 namespace EvoWpRestRegistration;
 
-use EvoWpRestRegistration\Validation;
 use WP_REST_Server;
+use WP_REST_Request;
+use EvoWpRestRegistration\Validation;
 
 defined('ABSPATH') or exit;
 
@@ -16,6 +17,9 @@ abstract class BaseRestController
     protected $rules = [];
     protected array $args = [];
     protected array $messages = [];
+    protected string $errorPermission = 'manage_options';
+
+    abstract public function handler(WP_REST_Request $request);
 
     /**
      * Registers the REST endpoint's sanitised path
@@ -38,7 +42,30 @@ abstract class BaseRestController
      */
     public function getCallback(): callable
     {
-        return [$this, 'handler'];
+        return function (WP_REST_Request $request) {
+            try {
+                if (method_exists($this, 'handler') === false) {
+                    throw new \Exception("You must define a handler method for this REST API route");
+                }
+                /** @disregard P1013 Undefined method */
+                return $this->handler($request);
+            } catch (\Exception $err) {
+                $isDetailedError = constant('WP_DEBUG') === true && is_user_logged_in() && current_user_can($this->errorPermission);
+                $message = $isDetailedError ? $this->getRestError($err) : ['message' => "Unable to process request"];
+                return wp_send_json_error($message, 500);
+            }
+        };
+    }
+
+    private function getRestError(\Exception $err)
+    {
+        return [
+            'message' => $err->getMessage(),
+            'code' => $err->getCode(),
+            'file' => $err->getFile(),
+            'line' => $err->getLine(),
+            'trace' => $err->getTrace()
+        ];
     }
 
     public function getPermissionCallback(): callable

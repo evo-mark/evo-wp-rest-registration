@@ -2,8 +2,6 @@
 
 namespace EvoWpRestRegistration;
 
-use Illuminate\Support\Str;
-
 class RestApi
 {
     public $base_url;
@@ -34,9 +32,9 @@ class RestApi
      */
     private function requestMatchesPrefix($request): bool
     {
-        $requestRoute = str($request->get_route())->trim("/ ")->lower()->value;
-        $prefix = str($this->prefix())->lower()->value;
-        return Str::startsWith($requestRoute, $prefix);
+        $requestRoute = strtolower(trim($request->get_route(), "/ "));
+        $prefix = strtolower($this->prefix());
+        return strpos($requestRoute, $prefix) === 0;
     }
 
     /**
@@ -99,7 +97,8 @@ class RestApi
 
     public function registerRoutes(): void
     {
-        $routeFiles = collect(self::rsearch($this->directory, "/.*\.php$/"))->reverse();
+        $routeFiles = self::rsearch($this->directory, "/.*\.php$/");
+        $routeFiles = array_reverse($routeFiles);
         $count = 0;
         foreach ($routeFiles as $file) {
             $class = $this->namespace . self::convertPathToClass($file);
@@ -107,7 +106,7 @@ class RestApi
             if (class_exists($class)) {
                 $endpoint = new $class;
 
-                register_rest_route($this->prefix(), Str::start($endpoint->getPath(), "/"), [
+                register_rest_route($this->prefix(), $this->strStart($endpoint->getPath(), "/"), [
                     'args'  => $endpoint->getArguments(),
                     'callback'  => $endpoint->getCallback(),
                     'methods'   => $endpoint->getMethods(),
@@ -119,5 +118,10 @@ class RestApi
             }
             $count++;
         }
+    }
+
+    private function strStart($subject, $cap = "/"): string
+    {
+        return $cap . ltrim($subject, $cap);
     }
 }

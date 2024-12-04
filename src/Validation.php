@@ -70,6 +70,11 @@ class Validation
 
     private function prepareValue($value, $param, $ruleSet)
     {
+        // Handle a string 'null' value such as might be sent by a file field
+        if ($value === 'null') {
+            $value = null;
+        }
+        
         if (in_array('array', $ruleSet) && is_string($value) === true) {
             $value = array_filter(explode(",", $value));
         } else if (in_array('boolean', $ruleSet)) {

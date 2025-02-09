@@ -67,7 +67,7 @@ class RestApi
 
     public static function formatDir($dir): string
     {
-        return rtrim($dir, '/') . '/';
+        return rtrim($dir, '/\\') . DIRECTORY_SEPARATOR;
     }
 
     public static function formatNamespace($ns): string

@@ -89,10 +89,10 @@ class RestApi
         return $fileList;
     }
 
-    public static function convertPathToClass($path, $ext = ".php"): string
+    public static function convertPathToClass($path, $directory, $ext = ".php"): string
     {
         $path = str_replace($ext, "", $path);
-        return str_replace(DIRECTORY_SEPARATOR, "\\", $path);
+        return ltrim(str_replace(rtrim($directory, '/'), '', $path), DIRECTORY_SEPARATOR);
     }
 
     public function registerRoutes(): void
@@ -101,7 +101,7 @@ class RestApi
         $routeFiles = array_reverse($routeFiles);
         $count = 0;
         foreach ($routeFiles as $file) {
-            $class = $this->namespace . self::convertPathToClass($file);
+            $class = $this->namespace . self::convertPathToClass($file, $this->directory);
 
             if (class_exists($class)) {
                 $endpoint = new $class;

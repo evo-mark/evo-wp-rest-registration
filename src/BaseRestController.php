@@ -30,6 +30,14 @@ abstract class BaseRestController
     }
 
     /**
+     * Function that returns the rules array for the endpoint
+     */
+    protected function getRules(): array
+    {
+        return $this->rules;
+    }
+
+    /**
      * Registers the REST endpoint's `methods` property
      */
     public function getMethods(): string|array
@@ -75,8 +83,9 @@ abstract class BaseRestController
 
     public function getArguments(): array
     {
-        if (!empty($this->rules)) {
-            $this->validator = new Validation($this->rules, $this->args, new ValidationMessages($this->messages));
+        $rules = $this->getRules();
+        if (!empty($rules)) {
+            $this->validator = new Validation($rules, $this->args, new ValidationMessages($this->messages));
             return $this->validator->createValidationCallback();
         } else return $this->args ?? [];
     }

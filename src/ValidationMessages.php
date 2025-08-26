@@ -42,7 +42,9 @@ class ValidationMessages
             'file' => '%param% must be a valid file',
             'extensions' => '%param% must be a file with extension of %args%',
             'mimetypes' => '%param% must be a file with a mime type of %args%',
-            'date' => '%param% must be a valid date'
+            'date' => '%param% must be a valid date',
+            'enum_invalid' => 'Invalid enum provided to %param%',
+            'enum_invalid_value' => '%param% value is invalid'
         ];
     }
 }

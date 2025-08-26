@@ -3,12 +3,12 @@
 namespace EvoWpRestRegistration;
 
 use DateTimeInterface;
-use \WP_Error;
+use WP_Error;
 use WP_REST_Request;
 
 class ValidationRule
 {
-    private string $definition;
+    private string|Rule $definition;
     private array $arguments;
     private $messageCentre;
     private $param;
@@ -26,7 +26,12 @@ class ValidationRule
         $this->value = $value;
         $this->request = $request;
 
-        if (method_exists($this, $this->definition)) {
+        if ($this->definition instanceof Rule) {
+            $error = $this->definition->validate($this->value);
+            if (!empty($error)) {
+                $this->createError($error);
+            }
+        } elseif (method_exists($this, $this->definition)) {
             $this->{$this->definition}();
         }
     }
@@ -41,15 +46,21 @@ class ValidationRule
         return $camelCaseString;
     }
 
-    public function resolveDefinition(string $ruleItem): string
+    public function resolveDefinition(string|Rule $ruleItem): string|Rule
     {
+        if ($ruleItem instanceof Rule) {
+            return $ruleItem;
+        }
         $exploded = explode(":", $ruleItem);
         $first = array_shift($exploded);
         return $this->convertSnakeToCamel($first);
     }
 
-    public function resolveArguments(string $ruleItem): array
+    public function resolveArguments(string|Rule $ruleItem): array
     {
+        if ($ruleItem instanceof Rule) {
+            return [];
+        }
         $exploded = explode(":", $ruleItem, 2);
         $argString = array_pop($exploded);
         return explode(",", $argString);
@@ -57,24 +68,32 @@ class ValidationRule
 
     private function required()
     {
-        if ($this->request->has_param($this->param) === false || empty($this->value)) $this->createError('required');
+        if ($this->request->has_param($this->param) === false || empty($this->value)) {
+            $this->createError('required');
+        }
     }
 
     private function nullable()
     {
-        if (empty($this->value)) $this->skip = true;
+        if (empty($this->value)) {
+            $this->skip = true;
+        }
     }
 
     private function sometimes()
     {
-        if ($this->request->has_param($this->param) === false) $this->skip = true;
+        if ($this->request->has_param($this->param) === false) {
+            $this->skip = true;
+        }
     }
 
     private function accepted()
     {
         $acceptedValues = ['yes', 'on', '1', 'true'];
 
-        if (!in_array(strtolower($this->value), $acceptedValues, true)) $this->createError('accepted');
+        if (!in_array(strtolower($this->value), $acceptedValues, true)) {
+            $this->createError('accepted');
+        }
     }
 
     private function file()
@@ -99,14 +118,18 @@ class ValidationRule
     private function extensions()
     {
         $error = false;
-        if (!isset($this->value['full_path'])) $error = true;
+        if (!isset($this->value['full_path'])) {
+            $error = true;
+        }
 
         if (!$error) {
             $fileInfo = pathinfo($this->value['full_path']);
             $extension = isset($fileInfo['extension']) ? $fileInfo['extension'] : '';
         }
 
-        if ($error === true || !in_array($extension, $this->arguments)) $this->createError('extensions');
+        if ($error === true || !in_array($extension, $this->arguments)) {
+            $this->createError('extensions');
+        }
     }
 
     private function mimetypes()
@@ -118,17 +141,23 @@ class ValidationRule
 
     private function string()
     {
-        if (!is_string($this->value)) $this->createError('string');
+        if (!is_string($this->value)) {
+            $this->createError('string');
+        }
     }
 
     private function lowercase()
     {
-        if (strtolower($this->value) !== $this->value) $this->createError('lowercase');
+        if (strtolower($this->value) !== $this->value) {
+            $this->createError('lowercase');
+        }
     }
 
     private function uppercase()
     {
-        if (strtoupper($this->value) !== $this->value) $this->createError('lowercase');
+        if (strtoupper($this->value) !== $this->value) {
+            $this->createError('lowercase');
+        }
     }
 
     private function startsWith()
@@ -143,7 +172,9 @@ class ValidationRule
             }
         }
 
-        if (!$found) $this->createError('starts_with');
+        if (!$found) {
+            $this->createError('starts_with');
+        }
     }
 
     private function endsWith()
@@ -158,7 +189,9 @@ class ValidationRule
             }
         }
 
-        if (!$found) $this->createError('ends_with');
+        if (!$found) {
+            $this->createError('ends_with');
+        }
     }
 
     private function alphaUnderscore()
@@ -191,7 +224,9 @@ class ValidationRule
 
     private function numeric()
     {
-        if (!is_numeric($this->value)) $this->createError('numeric');
+        if (!is_numeric($this->value)) {
+            $this->createError('numeric');
+        }
     }
 
     private function min()
@@ -200,10 +235,14 @@ class ValidationRule
 
         if ($this->_isFile($this->param)) {
             $value = floatval($this->value['size']) / 1024;
-            if ($value < $bound) $this->createError('min_filesize');
+            if ($value < $bound) {
+                $this->createError('min_filesize');
+            }
         } else {
             $value = floatval($this->value);
-            if ($value < $bound) $this->createError('min');
+            if ($value < $bound) {
+                $this->createError('min');
+            }
         }
     }
 
@@ -213,49 +252,71 @@ class ValidationRule
 
         if ($this->_isFile($this->param)) {
             $value = floatval($this->value['size']) / 1024;
-            if ($value > $bound) $this->createError('max_filesize');
+            if ($value > $bound) {
+                $this->createError('max_filesize');
+            }
         } else {
             $value = floatval($this->value);
-            if ($value > $bound) $this->createError('max');
+            if ($value > $bound) {
+                $this->createError('max');
+            }
         }
     }
 
     private function array()
     {
-        if (!is_array($this->value)) $this->createError('array');
+        if (!is_array($this->value)) {
+            $this->createError('array');
+        }
     }
 
     private function in()
     {
-        if (!in_array($this->value, $this->arguments)) $this->createError('in');
+        if (!in_array($this->value, $this->arguments)) {
+            $this->createError('in');
+        }
     }
 
     private function notIn()
     {
-        if (in_array($this->value, $this->arguments)) $this->createError('not_in');
+        if (in_array($this->value, $this->arguments)) {
+            $this->createError('not_in');
+        }
     }
 
     private function boolean()
     {
-        if (!is_bool($this->value)) $this->createError('boolean');
+        if (!is_bool($this->value)) {
+            $this->createError('boolean');
+        }
     }
 
     private function email()
     {
-        if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) $this->createError('email');
+        if (!filter_var($this->value, FILTER_VALIDATE_EMAIL)) {
+            $this->createError('email');
+        }
     }
 
     private function json()
     {
-        if (is_null(json_decode($this->value))) $this->createError('json');
+        if (is_null(json_decode($this->value))) {
+            $this->createError('json');
+        }
     }
 
     private function url()
     {
         $filters = [FILTER_VALIDATE_URL];
-        if (in_array('path', $this->arguments)) $filters[] = FILTER_FLAG_PATH_REQUIRED;
-        if (in_array('query', $this->arguments)) $filters[] = FILTER_FLAG_QUERY_REQUIRED;
-        if (!filter_var($this->value, ...$filters)) $this->createError('url');
+        if (in_array('path', $this->arguments)) {
+            $filters[] = FILTER_FLAG_PATH_REQUIRED;
+        }
+        if (in_array('query', $this->arguments)) {
+            $filters[] = FILTER_FLAG_QUERY_REQUIRED;
+        }
+        if (!filter_var($this->value, ...$filters)) {
+            $this->createError('url');
+        }
     }
 
     private function exists()
@@ -336,7 +397,7 @@ class ValidationRule
             if (is_string($replacer) === false) {
                 if (is_array($replacer) && empty($replacer)) {
                     $replacer = "";
-                } else if (is_array($replacer) || is_object($replacer)) {
+                } elseif (is_array($replacer) || is_object($replacer)) {
                     $replacer = json_encode($replacer);
                 }
             }

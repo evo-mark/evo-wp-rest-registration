@@ -34,7 +34,8 @@ abstract class BaseRestController
      */
     protected function getRules(): array
     {
-        return $this->rules;
+        /** @disregard P1013 'rules' is an optional method for this class */
+        return method_exists($this, 'rules') ? $this->rules() : $this->rules;
     }
 
     /**
@@ -87,7 +88,9 @@ abstract class BaseRestController
         if (!empty($rules)) {
             $this->validator = new Validation($rules, $this->args, new ValidationMessages($this->messages));
             return $this->validator->createValidationCallback();
-        } else return $this->args ?? [];
+        } else {
+            return $this->args ?? [];
+        }
     }
 
     public function authorise()

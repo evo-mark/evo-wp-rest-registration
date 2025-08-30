@@ -44,7 +44,9 @@ class ValidationMessages
             'mimetypes' => '%param% must be a file with a mime type of %args%',
             'date' => '%param% must be a valid date',
             'enum_invalid' => 'Invalid enum provided to %param%',
-            'enum_invalid_value' => '%param% value is invalid'
+            'enum_invalid_value' => '%param% value is invalid',            
+            'confirmed_none' => '%param% must be confirmed',
+            'confirmed' => '%param% does not match confirmation'
         ];
     }
 }

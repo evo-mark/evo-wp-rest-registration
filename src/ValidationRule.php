@@ -62,6 +62,9 @@ class ValidationRule
             return [];
         }
         $exploded = explode(":", $ruleItem, 2);
+        if (count($exploded) < 2) {
+            return [];
+        }
         $argString = array_pop($exploded);
         return explode(",", $argString);
     }
@@ -70,6 +73,20 @@ class ValidationRule
     {
         if ($this->request->has_param($this->param) === false || empty($this->value)) {
             $this->createError('required');
+        }
+    }
+
+    private function confirmed()
+    {
+        $confirmKey = $this->param . "_confirmation";
+        if (!empty($this->arguments[0])) {
+            $confirmKey = $this->arguments[0];
+        }
+
+        if ($this->request->has_param($confirmKey) === false) {
+            $this->createError("confirmed_none");
+        } elseif ($this->value !== $this->request->get_param($confirmKey)) {
+            $this->createError('confirmed');
         }
     }
 

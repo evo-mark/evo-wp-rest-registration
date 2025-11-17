@@ -16,8 +16,9 @@ class ValidationRule
     private WP_REST_Request $request;
     public $error;
     public bool $skip = false;
+    public array $ruleSet;
 
-    public function __construct($ruleItem, $param, $value, $messageCentre, $request)
+    public function __construct($ruleItem, $param, $value, $messageCentre, $request, $ruleSet)
     {
         $this->definition = $this->resolveDefinition($ruleItem);
         $this->arguments = $this->resolveArguments($ruleItem);
@@ -25,6 +26,7 @@ class ValidationRule
         $this->param = $param;
         $this->value = $value;
         $this->request = $request;
+        $this->ruleSet = $ruleSet;
 
         if ($this->definition instanceof Rule) {
             $error = $this->definition->validate($this->value);
@@ -130,6 +132,17 @@ class ValidationRule
         $prefix = apply_filters(Hooks::FILE_PREFIX, "", $param, $files, $this->request);
         $param = $prefix . $param;
         return isset($files[$param]);
+    }
+
+    private function _isString($value)
+    {
+        if (in_array('string', $this->ruleSet)) {
+            return true;
+        } else if (is_string($value) && preg_match('/$[a-zA-Z]/', $value)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function extensions()
@@ -250,7 +263,11 @@ class ValidationRule
     {
         $bound = floatval($this->arguments[0] ?? $this->param);
 
-        if ($this->_isFile($this->param)) {
+        if ($this->_isString($this->value)) {
+            if (strlen($this->value) < $bound) {
+                $this->createError('min');
+            }
+        } else if ($this->_isFile($this->param)) {
             $value = floatval($this->value['size']) / 1024;
             if ($value < $bound) {
                 $this->createError('min_filesize');
@@ -267,7 +284,11 @@ class ValidationRule
     {
         $bound = floatval($this->arguments[0] ?? $this->param);
 
-        if ($this->_isFile($this->param)) {
+        if ($this->_isString($this->value)) {
+            if (strlen($this->value) > $bound) {
+                $this->createError('max');
+            }
+        } else if ($this->_isFile($this->param)) {
             $value = floatval($this->value['size']) / 1024;
             if ($value > $bound) {
                 $this->createError('max_filesize');

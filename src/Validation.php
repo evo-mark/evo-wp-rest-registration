@@ -40,7 +40,7 @@ class Validation
         return function ($value, $request, $param) use ($ruleSet) {
             $value = $this->prepareValue($value, $param, $ruleSet);
             foreach ($ruleSet as $ruleItem) {
-                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $this->messageCentre, $request);
+                $ruleResolver = new ValidationRule($ruleItem, $param, $value, $this->messageCentre, $request, $ruleSet);
                 if ($ruleResolver->error) {
                     return $ruleResolver->error;
                 } else if ($ruleResolver->skip === true) {

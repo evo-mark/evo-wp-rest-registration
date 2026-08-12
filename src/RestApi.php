@@ -9,6 +9,7 @@ class RestApi
     public $namespace;
     public $directory;
     public $cors;
+    public array $exclude;
 
     public function __construct(array $args = [])
     {
@@ -18,11 +19,15 @@ class RestApi
                 throw new \Exception("Evo WP Rest Registration: no " . $item . " provided");
             }
         }
+        if (isset($args['exclude']) && is_array($args['exclude']) === false) {
+            throw new \Exception("Evo WP Rest Registration: exclude must be an array of classnames");
+        }
 
         $this->base_url = $args['base_url'];
         $this->version = $args['version'] ?? 1;
         $this->namespace = self::formatNamespace($args['namespace']);
         $this->directory = self::formatDir($args['directory']);
+        $this->exclude = $args['exclude'] ?? [];
 
         add_action('rest_api_init', [$this, 'registerRoutes']);
         add_filter('rest_pre_dispatch', [$this, '_processRequest'], 10, 3);
@@ -106,6 +111,10 @@ class RestApi
         $count = 0;
         foreach ($routeFiles as $file) {
             $class = $this->namespace . self::convertPathToClass($file);
+            // Check if the FQCN is excluded, or the class filename begins with an underscore, if so, skip
+            if (in_array($class, $this->exclude, true) || str_starts_with(basename($file), '_')) {
+                continue;
+            }
 
             if (class_exists($class)) {
                 $endpoint = new $class;
